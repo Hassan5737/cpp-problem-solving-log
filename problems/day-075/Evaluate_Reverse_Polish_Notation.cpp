@@ -1,33 +1,35 @@
 /*
 ==================================================
-Problem: Min Stack
+Problem: Evaluate Reverse Polish Notation
 
 Platform: LeetCode
-Problem Number: 155
+Problem Number: 150
 
 Difficulty: Medium
 
 Topics:
 - Stack
-- Design
+- Math
+- String
 
 Approach:
-- Use two stacks.
-- The main stack stores all values.
-- The minimum stack stores the minimum value
-  at each stack level.
-- When pushing a value, update the minimum stack
-  with the smaller value between the new value
-  and the current minimum.
-- When popping, pop from both stacks.
-- The top of the minimum stack is always the
-  current minimum value.
+- Traverse the tokens from left to right.
+- If the token is a number, push it onto the stack.
+- If the token is an operator:
+    1. Pop the second operand.
+    2. Pop the first operand.
+    3. Apply the operator.
+    4. Push the result back onto the stack.
+- After processing all tokens, the stack contains
+  the final result.
+
+Important:
+For subtraction and division, the order matters:
+first operand = second popped value
+second operand = first popped value.
 
 Time Complexity:
-- push(): O(1)
-- pop(): O(1)
-- top(): O(1)
-- getMin(): O(1)
+O(n)
 
 Space Complexity:
 O(n)
@@ -38,48 +40,55 @@ Date:
 */
 
 #include <iostream>
+#include <vector>
+#include <string>
 #include <stack>
 
 using namespace std;
 
-class MinStack
+class Solution
 {
-private:
-    stack<int> st;
-    stack<int> minSt;
-
 public:
-    MinStack()
+    int evalRPN(vector<string>& tokens)
     {
-    }
+        stack<int> st;
 
-    void push(int val)
-    {
-        st.push(val);
-
-        if (minSt.empty())
+        for (string token : tokens)
         {
-            minSt.push(val);
-        }
-        else
-        {
-            minSt.push(min(val, minSt.top()));
-        }
-    }
+            if (token == "+" ||
+                token == "-" ||
+                token == "*" ||
+                token == "/")
+            {
+                int second = st.top();
+                st.pop();
 
-    void pop()
-    {
-        st.pop();
-        minSt.pop();
-    }
+                int first = st.top();
+                st.pop();
 
-    int top()
-    {
+                if (token == "+")
+                {
+                    st.push(first + second);
+                }
+                else if (token == "-")
+                {
+                    st.push(first - second);
+                }
+                else if (token == "*")
+                {
+                    st.push(first * second);
+                }
+                else
+                {
+                    st.push(first / second);
+                }
+            }
+            else
+            {
+                st.push(stoi(token));
+            }
+        }
+
         return st.top();
-    }
-
-    int getMin()
-    {
-        return minSt.top();
     }
 };
